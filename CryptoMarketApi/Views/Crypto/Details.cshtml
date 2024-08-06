@@ -1,0 +1,124 @@
+﻿@using Newtonsoft.Json;
+@model CryptoMarketApi.Models.CryptoData
+@{
+    var historicalData = ViewBag.HistoricalData;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.Name - Details</title>
+    <link rel="stylesheet" type="text/css" href="/CSS/Site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+</head>
+<body class="custom-bg-color">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">Crypto Market</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown ml-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="currencyDropdownBtn" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Currency
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="currencyDropdownBtn" id="currencyDropdown">
+                        <a class="dropdown-item" href="#" data-currency="usd">USD</a>
+                        <a class="dropdown-item" href="#" data-currency="eur">EUR</a>
+                        <a class="dropdown-item" href="#" data-currency="gbp">GBP</a>
+                        <a class="dropdown-item" href="#" data-currency="zar">ZAR</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+<div class="container">
+        <div class="crypto-header">
+            <img src="@Model.ImageUrl" alt="@Model.Name" />
+            <h1>@Model.Name (@Model.Symbol)</h1>
+            
+        </div>
+
+        <div class="chart-container">
+            <canvas id="historicalChart"></canvas>
+        </div>
+
+        <div class="crypto-info">
+            <h3>Crypto Market Rank: # @Model.Rank</h3>
+            <h3 id="currentPrice">$ @Model.Price</h3>
+            <h3>24H Change: @Model.Change24h %</h3>
+            <h3 id="marketCap">$ @Model.MarketCap</h3>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('historicalChart').getContext('2d');
+            var historicalData1 = @Html.Raw(JsonConvert.SerializeObject(historicalData));
+            var prices = historicalData1.prices.map(function (point) {
+                return { x: new Date(point[0]), y: point[1] };
+            });
+
+            var selectedCurrency = localStorage.getItem('selectedCurrency') || 'usd';
+            var currencySymbols = {
+                'usd': '$',
+                'eur': '€',
+                'gbp': '£',
+                'zar': 'R'
+            };
+            var currencySymbol = currencySymbols[selectedCurrency] || '$';
+
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Historical Prices',
+                        data: prices,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false,
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: `Price (${currencySymbol})`
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Update current price and market cap with selected currency
+            document.getElementById('currentPrice').innerText = `Current Price: ${currencySymbol}@Model.Price`;
+            document.getElementById('marketCap').innerText = `Market Cap: ${currencySymbol}@Model.MarketCap`;
+
+            // Function to update the chart title dynamically
+            function updateChartTitle() {
+                chart.options.scales.y.title.text = `Price (${currencySymbol})`;
+                chart.update();
+            }
+
+            // Update chart title on page load
+            updateChartTitle();
+        });
+    </script>
+</body>
+</html>

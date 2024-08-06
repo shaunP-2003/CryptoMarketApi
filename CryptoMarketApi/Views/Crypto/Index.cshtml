@@ -1,0 +1,240 @@
+﻿@using Newtonsoft.Json;
+@model List<CryptoMarketApi.Models.CryptoData>
+@{
+    var allCrypto = (List<CryptoMarketApi.Models.CryptoData>)ViewBag.AllCrypto;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Jost:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <title>CRYPTOVIZ</title>
+    <link rel="stylesheet" type="text/css" href="/CSS/Site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <style>
+        .crypto-row {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="custom-bg-color">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">CRYPTOVIZ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item ml-3">
+                    <a class="nav-link" href="#home">Home</a>
+                </li>
+                <li class="nav-item ml-3">
+                    <a class="nav-link" href="#market">Market</a>
+                </li>
+                <li class="nav-item dropdown ml-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="currencyDropdownBtn" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Currency
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="currencyDropdownBtn" id="currencyDropdown">
+                        <a class="dropdown-item" href="#" data-currency="usd">USD</a>
+                        <a class="dropdown-item" href="#" data-currency="eur">EUR</a>
+                        <a class="dropdown-item" href="#" data-currency="gbp">GBP</a>
+                        <a class="dropdown-item" href="#" data-currency="zar">ZAR</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown ml-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="rankDropdownBtn" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Show
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="rankDropdownBtn" id="rankDropdown">
+                        <a class="dropdown-item" href="#" data-rank="10">Top 10</a>
+                        <a class="dropdown-item" href="#" data-rank="25">Top 25</a>
+                        <a class="dropdown-item" href="#" data-rank="50">Top 50</a>
+                        <a class="dropdown-item" href="#" data-rank="100">Top 100</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <section id="home" class="home">
+        <div class="hero">
+        <div class="hero-content">
+            <h1>Search and Track<br> <span>Crypto Currencies</span></h1>
+                <p>CryptoViz - Real-Time Data & Past Performance</p>
+                <a href="#market" class="btn">Go to Market</a>
+         </div>
+        <a href="https://www.flaticon.com/free-icons/bitcoin" class="icon-right">
+                <img src="/Images/bitcoin1.png" alt="Bitcoin Icon" class="icon">
+        </a>
+        </div>
+    </section>
+
+    <section id="market" class="market">
+        <div class="container">
+            <div class="market-header">
+                <h2>Market Updates</h2>
+             </div>
+            <form>
+                <input type="text" id="search" class="form-control" placeholder="Search for a coin...">
+            </form>
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Coins</th>
+                        <th>Price</th>
+                        <th>24H Change</th>
+                        <th>Market Cap</th>
+                    </tr>
+                </thead>
+                <tbody id="cryptoTable">
+                    @foreach (var crypto in Model)
+                    {
+                        <tr class="crypto-row" ref="@Url.Action("Details", "Crypto", new { sId = crypto.Id })">
+                            <td>@crypto.Rank</td>
+                            <td class="crypto-name">
+                                <img src="@crypto.ImageUrl" alt="@crypto.Name" width="30" height="30" class="mr-2" />
+                                @crypto.Name - @crypto.Symbol
+                            </td>
+                            <td class="crypto-price">$ @crypto.Price</td>
+                            <td class="crypto-change" data-change="@crypto.Change24h">@crypto.Change24h %</td>
+                            <td class="crypto-marketcap">$ @crypto.MarketCap</td>
+
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <footer>
+        <p>Copyright@2024, CryptoViz - All Right Reserved.</p>
+    </footer>
+    <script>
+        $(document).ready(function () {
+            var allCryptoData = [];
+            var displayedCryptoData = [];
+            var selectedCurrency = localStorage.getItem('selectedCurrency') || 'usd'; // default currency
+            var selectedRank = 10; // default rank
+
+            $('#currencyDropdownBtn').text(selectedCurrency.toUpperCase());
+
+            // Load initial data
+            loadCryptoData(selectedCurrency);
+
+            // Event listener for currency dropdown change
+            $('#currencyDropdown .dropdown-item').on('click', function () {
+                selectedCurrency = $(this).data('currency');
+                $('#currencyDropdownBtn').text($(this).text()); // Update dropdown button text
+                localStorage.setItem('selectedCurrency', selectedCurrency); // Save selected currency to localStorage
+                loadCryptoData(selectedCurrency);
+            });
+
+            // Event listener for rank dropdown change
+            $('#rankDropdown .dropdown-item').on('click', function () {
+                selectedRank = $(this).data('rank');
+                $('#rankDropdownBtn').text($(this).text()); // Update dropdown button text
+                applyFilterAndSearch();
+            });
+
+            // Event listener for search
+            $('#search').on('keyup', function () {
+                applyFilterAndSearch();
+            });
+
+            // Function to load crypto data based on selected currency
+            function loadCryptoData(currency) {
+                console.log('Loading data for currency:', currency); // Log the selected currency
+
+                $.ajax({
+                    url: `/Crypto/GetCryptoData?currency=${currency}`,
+                    type: 'GET',
+                    success: function (data) {
+                        console.log('Data loaded:', data); // Log the fetched data
+
+                        allCryptoData = data;
+                        applyFilterAndSearch();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Failed to load data:', status, error); // Log errors
+                        alert('Failed to load data');
+                    }
+                });
+            }
+
+            // Function to apply filter and search
+            function applyFilterAndSearch() {
+                var searchValue = $('#search').val().toLowerCase();
+
+                displayedCryptoData = allCryptoData;
+
+                // Apply search
+                if (searchValue) {
+                    displayedCryptoData = displayedCryptoData.filter(function (crypto) {
+                        return crypto.name.toLowerCase().includes(searchValue) || crypto.symbol.toLowerCase().includes(searchValue);
+                    });
+                }
+
+                // Apply filter
+                displayedCryptoData = displayedCryptoData.slice(0, selectedRank);
+
+                console.log('Displaying data:', displayedCryptoData); // Log the data to be displayed
+                renderTable();
+            }
+
+            // Function to render the table
+            function renderTable() {
+                var currencySymbols = {
+                    'usd': '$',
+                    'eur': '€',
+                    'gbp': '£',
+                    'zar': 'R'
+                };
+                var currencySymbol = currencySymbols[selectedCurrency] || '$';
+
+                var tableContent = '';
+                displayedCryptoData.forEach(function (crypto) {
+                    tableContent +=
+                        '<tr class="crypto-row" data-id="' + crypto.id + '">' +
+                        '<td>' + crypto.rank + '</td>' +
+                        '<td class="crypto-name">' +
+                        '<img src="' + crypto.imageUrl + '" alt="' + crypto.name + '" width="20" height="20" class="mr-2"/>' +
+                        crypto.name + ' - ' + crypto.symbol +
+                        '</td>' +
+                        '<td class="crypto-price">' + currencySymbol + ' ' + crypto.price.toFixed(2) + '</td>' +
+                        '<td class="crypto-change" " data-change="' + crypto.change24h + '">' + crypto.change24h.toFixed(2) + ' %</td>' +
+                        '<td class="crypto-marketcap">' + currencySymbol + ' ' + crypto.marketCap.toLocaleString() + '</td>' +
+                        '</tr>';
+                });
+
+                $('#cryptoTable').html(tableContent); // Update the table body
+
+                const cryptoRows24h = document.querySelectorAll('.crypto-change');
+
+                cryptoRows24h.forEach(row => {
+                    const changeValue = parseFloat(row.getAttribute('data-change'));
+                    if (changeValue >= 0) {
+                        row.classList.add('positive-change');
+                    } else {
+                        row.classList.add('negative-change');
+                    }
+                });
+
+                // Event listener for row click
+                $('.crypto-row').on('click', function () {
+                    var id = $(this).data('id');
+                    window.location.href = `/Crypto/Details/${id}?currency=${selectedCurrency}`;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
