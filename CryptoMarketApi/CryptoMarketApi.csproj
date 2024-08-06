@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	<EnableDefaultContentItems>false</EnableDefaultContentItems>  
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,4 +17,11 @@
     <None Include="wwwroot\CSS\Site.css" />
   </ItemGroup>
 
+    <ItemGroup>
+	    <Content Include="wwwroot\**\*" CopyToPublishDirectory="PreserveNewest" />
+	    <Content Include="Views\**\*" CopyToPublishDirectory="PreserveNewest" />
+	    <Content Include="Controllers\**\*" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+
 </Project>
+
