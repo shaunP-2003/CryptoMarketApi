@@ -9,53 +9,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Jost:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
     <title>@Model.Name - Details</title>
     <link rel="stylesheet" type="text/css" href="/CSS/Site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
-<body class="custom-bg-color">
+<body class="custom-bg-colorD">
     <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="#">Crypto Market</a>
+        <a class="navbar-brand" href="#">CRYPTOVIZ</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown ml-3">
-                    <a class="nav-link dropdown-toggle" href="#" id="currencyDropdownBtn" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Currency
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="currencyDropdownBtn" id="currencyDropdown">
-                        <a class="dropdown-item" href="#" data-currency="usd">USD</a>
-                        <a class="dropdown-item" href="#" data-currency="eur">EUR</a>
-                        <a class="dropdown-item" href="#" data-currency="gbp">GBP</a>
-                        <a class="dropdown-item" href="#" data-currency="zar">ZAR</a>
-                    </div>
+                <li class="nav-item ml-3">
+                    <a class="nav-link" href="@Url.Action("Index", "Crypto")">Home</a>
                 </li>
+                <li class="nav-item ml-3">
+                    <a class="nav-link" href="@Url.Action("Index", "Crypto")#market">Market</a>
+                </li>
+                
             </ul>
         </div>
     </nav>
-<div class="container">
-        <div class="crypto-header">
-            <img src="@Model.ImageUrl" alt="@Model.Name" />
-            <h1>@Model.Name (@Model.Symbol)</h1>
-            
+    <section id="details" class="details-section">
+        <div class="main-container">
+            <div class="left-column">
+                <div class="crypto-header">
+                    <img src="@Model.ImageUrl" alt="@Model.Name" />
+                    <h1>@Model.Name (@Model.Symbol)</h1>
+                </div>
+                <div class="crypto-info">
+                    <div class="info-item">
+                        <span class="label">Crypto Market Rank:</span>
+                        <span class="value"># @Model.Rank</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Current Price:</span>
+                        <span class="value" id="currentPrice">$ @Model.Price.ToString("N0")</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">24H Change:</span>
+                         <span id="change24hValue" class="value">@Model.Change24h %</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Market Cap:</span>
+                        <span class="value" id="marketCap">$ @Model.MarketCap.ToString("N0")</span>
+                    </div>
+                </div>
+            </div>
+            <div class="right-column">
+                <div class="chart-container">
+                    <canvas id="historicalChart"></canvas>
+                </div>
+            </div>
         </div>
-
-        <div class="chart-container">
-            <canvas id="historicalChart"></canvas>
-        </div>
-
-        <div class="crypto-info">
-            <h3>Crypto Market Rank: # @Model.Rank</h3>
-            <h3 id="currentPrice">$ @Model.Price</h3>
-            <h3>24H Change: @Model.Change24h %</h3>
-            <h3 id="marketCap">$ @Model.MarketCap</h3>
-        </div>
-    </div>
+    </section>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var ctx = document.getElementById('historicalChart').getContext('2d');
@@ -63,6 +81,18 @@
             var prices = historicalData1.prices.map(function (point) {
                 return { x: new Date(point[0]), y: point[1] };
             });
+
+            var change24hValueElement = document.getElementById('change24hValue');
+            var change24hValue = parseFloat(change24hValueElement.textContent);
+
+            if (change24hValue >= 0) 
+            {
+                change24hValueElement.style.color = 'green'; 
+            } 
+            else 
+            {
+                change24hValueElement.style.color = 'red'; 
+            }
 
             var selectedCurrency = localStorage.getItem('selectedCurrency') || 'usd';
             var currencySymbols = {
@@ -73,51 +103,114 @@
             };
             var currencySymbol = currencySymbols[selectedCurrency] || '$';
 
+            var change24h = @Model.Change24h;
+            var lineColor = change24h >= 0 ? 'rgba(0, 200, 83, 1)' : 'rgba(255, 82, 82, 1)'; 
+            var fillColor = change24h >= 0 ? 'rgba(0, 200, 83, 0.04)' : 'rgba(255, 82, 82, 0.04)'; 
+
+
             var chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     datasets: [{
                         label: 'Historical Prices',
                         data: prices,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        fill: false,
+                        borderColor: lineColor,
+                        borderWidth: 2,
+                        pointRadius: 0, 
+                        fill: true, 
+                        backgroundColor: fillColor, 
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false, 
+                        },
+                        tooltip: {
+                            enabled: true,
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${currencySymbol}${tooltipItem.raw.y}`;
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: {
                             type: 'time',
                             time: {
-                                unit: 'day'
+                                unit: 'day',
+                                tooltipFormat: 'll',
+                            },
+                            ticks: {
+                                color: 'rgba(128, 128, 128, 1)',
+                            },
+                            grid: {
+                                display: false,
                             },
                             title: {
                                 display: true,
-                                text: 'Date'
-                            }
+                                text: 'Date',
+                                color: 'rgba(128, 128, 128, 1)',
+                            },
                         },
                         y: {
+                            ticks: {
+                                color: 'rgba(128, 128, 128, 1)',
+                                callback: function (value) {
+                                    return `${currencySymbol}${value}`;
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(75, 192, 192, 0.1)',
+                            },
                             title: {
                                 display: true,
-                                text: `Price (${currencySymbol})`
+                                text: `Price (${currencySymbol})`,
+                                color: 'rgba(128, 128, 128, 1)',
                             }
                         }
-                    }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.1, 
+                        },
+                    },
                 }
             });
 
-            // Update current price and market cap with selected currency
-            document.getElementById('currentPrice').innerText = `Current Price: ${currencySymbol}@Model.Price`;
-            document.getElementById('marketCap').innerText = `Market Cap: ${currencySymbol}@Model.MarketCap`;
+            var currentPrice = parseFloat('@Model.Price');
+            var marketCap = parseFloat('@Model.MarketCap');
+
+            // Format the numbers with commas
+            var formattedPrice = currentPrice.toLocaleString();
+            var formattedMarketCap = marketCap.toLocaleString();
+
+        
+            document.getElementById('currentPrice').innerText = `${currencySymbol}${formattedPrice}`;
+            document.getElementById('marketCap').innerText = `${currencySymbol}${formattedMarketCap}`;
 
             // Function to update the chart title dynamically
             function updateChartTitle() {
                 chart.options.scales.y.title.text = `Price (${currencySymbol})`;
-                chart.update();
+
+                if (window.innerWidth <= 567) {
+                    chart.options.scales.x.title.display = false;
+                    chart.options.scales.y.title.display = false;
+                } else {
+                    chart.options.scales.x.title.display = true;
+                    chart.options.scales.y.title.display = true;
+                }
+                chart.update(); 
             }
 
-            // Update chart title on page load
             updateChartTitle();
+
+            window.addEventListener('resize', updateChartTitle)
         });
     </script>
 </body>

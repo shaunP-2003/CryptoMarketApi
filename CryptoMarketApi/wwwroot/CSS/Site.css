@@ -152,44 +152,49 @@ html {
         }
     }
 
-    @media (max-width: 480px) {
+@media (max-width: 390px) {
 
-        .home{
-            max-height:55vh;
-        }
-        .hero {
-            margin: 20px;
-            padding-top: 50px;
-        }
-
-        .hero-content {
-            margin-top: 70px;
-        }
-
-            .hero-content h1 {
-                font-size: 2rem; /* Further adjust font size for small screens */
-            }
-
-            .hero-content span {
-                font-size: 2.5rem; /* Further adjust font size for small screens */
-            }
-
-            .hero-content p {
-                font-size: 0.9rem; /* Further adjust font size for small screens */
-            }
-
-            .hero-content .btn {
-                font-size: 0.9rem; /* Further adjust font size for small screens */
-                padding: 6px 12px;
-            }
+    .home {
+        max-height: 55vh;
     }
 
-    @media (max-width: 768px) {
+    .hero {
+        margin: 20px;
+        padding-top: 50px;
+    }
 
-        .hero {
-            margin: 20px;
-            padding-top: 50px;
+    .hero-content {
+        margin-top: 80px;
+    }
+
+        .hero-content h1 {
+            font-size: 2rem; /* Further adjust font size for small screens */
         }
+
+        .hero-content span {
+            font-size: 2.5rem; /* Further adjust font size for small screens */
+        }
+
+        .hero-content p {
+            font-size: 0.9rem; /* Further adjust font size for small screens */
+        }
+
+        .hero-content .btn {
+            font-size: 0.9rem; /* Further adjust font size for small screens */
+            padding: 6px 12px;
+        }
+}
+
+@media (min-width: 380px) and (max-width: 768px) {
+
+    .hero {
+        margin: 20px;
+        padding-top: 50px;
+    }
+
+    .hero-content {
+        margin-top: 200px; /* Adjust font size for smaller screens */
+    }
 
         .hero-content h1 {
             font-size: 2.5rem; /* Adjust font size for smaller screens */
@@ -207,7 +212,7 @@ html {
             font-size: 1rem; /* Adjust font size for smaller screens */
             padding: 8px 16px;
         }
-    }
+}
     /*-----------------------------------Market-Section--------------------------------------------------------------------------------------------*/
 
 .market {
@@ -319,55 +324,196 @@ html {
     }
 }
 /*----------------------------------Details-Page--------------------------------------------*/
-.container {
-    margin-top: 60px;
+
+.custom-bg-colorD {
+    background-image: linear-gradient(0deg, #0f051d 30%, #130749 70%);
+    font-family: "Space Grotesk", sans-serif;
+}
+.details-section {
+    margin-top: 150px; /* Reduced margin to bring content closer */
+    margin-left:30px;
+}
+
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0 55px 20px;
     color: snow;
 }
 
-    .crypto-header {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 40px;
-        gap: 20px;
+.left-column, .right-column {
+    flex: 1;
+    margin: 10px;
+}
+
+.left-column {
+    max-width: 400px; /* Reduced width for better balance */
+    border-right: 2px solid #f3f2f4;
+    padding-right: 20px; /* Added padding for better spacing */
+}
+
+.right-column {
+    flex-grow: 2;
+    padding-left: 20px; /* Added padding for better spacing */
+}
+
+.crypto-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px; /* Slightly reduced margin */
+    gap: 15px; /* Reduced gap for a tighter look */
+}
+
+.crypto-header img {
+    width: 100px;
+    height: 100px;
+}
+
+.crypto-header h1 {
+    font-size: 2rem;
+    margin: 0;
+    font-weight: bold;
+}
+
+.crypto-info {
+    padding: 20px 20px 0 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px; /* Reduced space between rows */
+    border-bottom: 0.1px solid #f3f2f4;
+    padding-bottom: 10px; /* Added padding to separate text from the border */
+}
+
+.info-item .label {
+    font-weight: bold;
+    margin-right: 15px; /* Increased space between label and value */
+    font-size: 1.1rem; /* Increased font size for better readability */
+}
+
+.info-item .value {
+    flex-shrink: 0; /* Prevent the value from shrinking */
+    text-align: right;
+    font-size: 1.1rem; /* Increased font size for better readability */
+}
+
+.chart-container {
+    padding: 20px;
+    border-radius: 10px;
+    background-color: snow;
+    width: 100%; 
+    max-width: 700px; 
+    height: 400px;
+    margin: 0 auto; 
+}
+
+
+.chart-container canvas {
+    border-radius: 10px;
+    width: 100%;
+    height: 100%; 
+}
+
+
+@media (max-width: 1000px) {
+    .details-section {
+        margin-top: 100px;
+        margin-left: 10px;
     }
 
-        .crypto-header img {
-            width: 100px;
-            height: 100px;
-        }
+    .main-container {
+        flex-direction: column; /* Stack columns vertically */
+        align-items: center; /* Center align elements */
+        padding: 10px;
+    }
 
-        .crypto-header h2 {
-            font-size: 1.5rem;
-        }
+    .left-column, .right-column {
+        flex: none; /* Remove flex-grow to prevent stretching */
+        width: 100%; /* Make columns full width */
+        max-width: 800px;
+        margin: 10px 0; /* Add margin between sections */
+    }
+
+    .left-column {
+        border-right: none; /* Remove border on mobile */
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .crypto-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .crypto-header img {
+        width: 80px; /* Smaller image for mobile */
+        height: 80px;
+    }
+
+    .crypto-header h1 {
+        font-size: 1.5rem;
+    }
 
     .crypto-info {
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
+        padding: 15px;
+        text-align: center; /* Center text */
+    }
+
+    .info-item {
         text-align: center;
+        padding-bottom: 8px;
+    }
+
+    .info-item .label, .info-item .value {
+        font-size: 1rem;
     }
 
     .chart-container {
-        padding: 20px;
-        border-radius: 10px;
-        margin: auto;
-        text-align: center;
-        background-color: snow;
-        max-width: 700px;
-        height: 400px;
+        padding: 15px;
+        width: 100%; /* Full width chart */
+        max-width: 800px;
+        height: auto; /* Allow height to adjust based on aspect ratio */
+        margin-top: 20px; /* Add margin above the chart */
     }
 
-    .crypto-info h3, .crypto-info p {
-        font-size: 1.2rem;
+}
+
+/* Media query for devices with a max-width of 576px (smaller mobile devices) */
+@media (max-width: 576px) {
+    .details-section {
+        margin-top: 130px;
+        margin-left: 5px;
+    }
+
+    .crypto-header img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .crypto-header h1 {
+        font-size: 1.3rem;
+    }
+    .right-column{
+        padding-left: 0;
+    }
+    .chart-container {
+        padding: 15px;
+        height: 250px; /* Allow chart to adjust based on width */
     }
 
     .chart-container canvas {
-        border-radius: 10px;
+        width: 100% !important; /* Ensure the canvas takes full width */
+        height: auto !important; /* Allow canvas to adjust height automatically */
     }
-
-
-
+}
 
     /*----------------------footer--------------------------------------------------------------*/
 footer {
